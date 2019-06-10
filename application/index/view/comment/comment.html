@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<style type="text/css">
+*{
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+html,
+body {
+    background-color: #f0f2fa;
+    font-family: "PT Sans", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+    color: #555f77;
+    -webkit-font-smoothing: antialiased;
+}
+input,
+textarea {
+    outline: none;
+    border: none;
+    display: block;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    font-family: "PT Sans", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+    font-size: 1rem;
+    color: #555f77;
+}
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #ced2db;
+}
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: #ced2db;
+}
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    color: #ced2db;
+}
+p {
+    line-height: 1.3125rem;
+}
+.comments {
+    margin: 2.5rem auto 0;
+    max-width: 60.75rem;
+    padding: 0 1.25rem;
+}
+.comment-wrap {
+    margin-bottom: 1.25rem;
+    display: table;
+    width: 100%;
+    min-height: 5.3125rem;
+}
+.photo {
+    padding-top: 0.625rem;
+    display: table-cell;
+    width: 3.5rem;
+}
+.photo .avatar {
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 50%;
+    background-size: contain;
+}
+.comment-block {
+    padding: 1rem;
+    background-color: #fff;
+    display: table-cell;
+    vertical-align: top;
+    border-radius: 0.1875rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+}
+.comment-block textarea {
+    width: 100%;
+    max-width: 100%;
+}
+.comment-text {
+    margin-bottom: 1.25rem;
+}
+.bottom-comment {
+    color: #acb4c2;
+    font-size: 0.875rem;
+}
+.comment-date {
+    float: left;
+}
+.comment-actions {
+    float: right;
+}
+.comment-actions li {
+    display: inline;
+}
+.comment-actions li.complain {
+    padding-right: 0.625rem;
+    border-right: 1px solid #e1e5eb;
+    cursor: pointer;
+}
+.comment-actions li.reply {
+    padding-left: 0.625rem;
+    cursor: pointer;
+}
+.send{
+    float: right;
+    padding: 10px 20px;
+    background: #f5f5f5;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+</style>
+<script type="text/javascript" src="https://cdn.bootcss.com/vue/2.6.6/vue.common.dev.js"></script>
+
+<script type="text/javascript" src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+<body>
+    <div class="comments" id="app">
+
+        <div class="comment-wrap">
+            <div class="photo">
+                <div class="avatar" :style="{background: 'url('+avatar+')',backgroundSize: 'cover'}"></div>
+            </div>
+            <div class="comment-block">
+                <form action="">
+                    <textarea name="" id="" cols="30" rows="3" placeholder="Say somthing... " v-model="comments"></textarea>
+                    <div @click="addComm" class="send">发送</div>
+                </form>
+            </div>
+        </div>
+
+        <div class="comment-wrap" v-for="(item,idx) in list">
+            <div class="photo">
+                <div class="avatar" :style="{background: 'url('+item.avatar+')',backgroundSize: 'cover'}"></div>
+            </div>
+            <div class="comment-block">
+                <p class="comment-text">{{item.comment}}</p>
+                <div class="bottom-comment">
+                   <div >{{item.name}}</div>
+                   <div class="comment-date">{{item.time}}</div>
+                   <ul class="comment-actions">
+                    <li class="complain" @click="support(item,1,idx)">Support：{{item.support}}</li>
+                    <li class="reply" @click="sendreply(item,1,idx)">Reply</li>
+                </ul>
+                <div class="comment-wrap" v-for="(reply,replyindex) in item.reply" v-if="item.reply">
+                   <div class="photo">
+                    <div class="avatar" :style="{background: 'url('+reply.avatar+')',backgroundSize: 'cover'}"></div>
+                </div>
+                <div class="comment-block">
+                 <p class="comment-text" v-if="reply.replyType==0">{{reply.fromUser}}回复{{reply.toUser}}:{{reply.content}}</p>
+                 <p class="comment-text" v-else>{{reply.content}}</p>
+                 <div class="bottom-comment">
+                    <div >{{reply.name}}</div>
+                    <div class="comment-date">{{reply.time}}</div>
+                    <ul class="comment-actions">
+                        <li class="complain"  @click="support(reply,0,idx,replyindex)">Support：{{reply.support}}</li>
+                        <li class="reply" @click="sendreply(reply,0,idx)">Reply</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+<script type="text/javascript">
+	new Vue({
+		el:'#app',
+        data:{
+            list:[],
+            comments:'',
+            userid:'',
+            avatar:''
+        },
+        created(){
+          this.getList();
+          var data=this.getCookie('user');
+          if (data) {
+            console.log(JSON.parse(data).id)
+            this.userid=JSON.parse(data).id;
+            this.avatar=JSON.parse(data).avatar;
+        }else{
+            window.location.href='http://127.0.0.1/index.php/index/index/index'
+        }
+    },
+    methods:{
+       getList:function () {
+          var that=this;
+          axios.get('http://127.0.0.1/index/Comment/getComments').then((res)=>{
+             that.list=res.data.data
+             console.log(res.data.data)
+
+         })
+
+      },
+      addComm:function () {
+          var that=this;
+          axios.get('http://127.0.0.1/index/Comment/addComment',{
+           params:{
+              value:that.comments,
+              userId:that.userid
+          }
+      }).then((res)=>{
+       if (res.data.code==0) {
+          return alert('!')
+      }
+      console.log(that.list)
+      that.list.push(res.data.data)
+      that.comments=''
+      alert('评论成功')
+  })
+
+  },
+  sendreply:function (lis,type,idx) {
+
+    var that=this;
+    var res=prompt("回复"+lis.name,"");
+    if (res!=null && res!="") {
+      axios.get('http://127.0.0.1/index/Comment/addReply',{
+       params:{
+          content:res,
+          fromId:that.userid,
+          toUser:lis.userId,
+          type:type,
+          commentid:that.list[idx].id,
+      }
+  }).then((res)=>{
+   if (!that.list[idx].reply) {
+      that.$set(that.list[idx],'reply',[res.data.data])
+      console.log(that.list)
+  }
+  else{
+   that.list[idx].reply.push(res.data.data)
+}
+
+}).catch(function (error) { // 请求失败处理
+        console.log(error);
+      })
+}
+},
+getCookie(cookie_name) {
+    var allcookies = document.cookie;
+        //索引长度，开始索引的位置
+        var cookie_pos = allcookies.indexOf(cookie_name);
+
+        // 如果找到了索引，就代表cookie存在,否则不存在
+        if (cookie_pos != -1) {
+            // 把cookie_pos放在值的开始，只要给值加1即可
+            //计算取cookie值得开始索引，加的1为“=”
+            cookie_pos = cookie_pos + cookie_name.length + 1; 
+            //计算取cookie值得结束索引
+            var cookie_end = allcookies.indexOf(";", cookie_pos);
+            
+            if (cookie_end == -1) {
+                cookie_end = allcookies.length;
+
+            }
+            //得到想要的cookie的值
+            var value = unescape(allcookies.substring(cookie_pos, cookie_end)); 
+        }
+        return value;
+    },
+    support(list,type,idx,replyindex=0){
+        var that=this;
+        axios.get('http://127.0.0.1/index/Comment/addSupport',{
+            params:{
+                id:that.userid,
+                commentid:list.id,
+                type:type,
+            }
+        }).then((res)=>{
+         if (res.data.code==1) {
+            alert('点赞成功')
+            if (type==1) {
+                console.log(123)
+                that.list[idx].support+=1
+                that.$set(that.list,idx,that.list[idx])
+            }else{
+                console.log(replyindex)
+                that.list[idx].reply[replyindex].support+=1;
+                that.$set(that.list[idx],idx,that.list[idx].reply[replyindex])
+
+            }
+        }else if(res.data.code==2){
+            alert('取消点赞成功')
+            if (type==1) {
+                that.list[idx].support-=1
+                that.$set(that.list,idx,that.list[idx])
+            }else{
+                console.log(replyindex)
+                that.list[idx].reply[replyindex].support-=1;
+                that.$set(that.list[idx],idx,that.list[idx].reply[replyindex])
+            }
+        }
+    })
+    },
+}
+
+})
+</script>
+</body>
+</html>

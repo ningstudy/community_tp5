@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			
+			
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<div class="main">
+				<a class="title" href="/index/index/index" target="_parent" title="浦江"> 
+					<i class="iconfont icon-jiaoliu layui-hide-xs" style="font-size: 22px;"></i>
+					浦江你问我答社区</a>
+				<div class="nav">
+					<a class="nav-this" href="/index/index/index">
+						<i class="iconfont icon-wenda"></i>你问我答</a>
+				</div>
+				<div class="nav-user">
+					<!-- 
+                    	作者：634072111@qq.com
+                    	时间：2017-12-28
+                    	描述：登录后的样子 -->
+                   {if session('user')}
+					<a class="avatar" href="/index/index/index">
+						<img src="{$Request.session.user.avatar}">
+						<cite>{$Request.session.user.userName}</cite>
+					</a>
+					<div class="nav">
+						<a href="/index/User/exitLogin"><i class="iconfont icon-tuichu" style="top: 0; font-size: 22px;"></i>退出</a>
+					</div>
+					{/if}
+					 
+					 
+					<!--
+                    	作者：634072111@qq.com
+                    	时间：2017-12-28
+                    	描述：未登录的样子
+                    -->
+                    {if  !session('user')}
+                    <a   class="iconfont icon-touxiang layui-hide-xs" style="margin-top: 4px; display: inline-block;">
+                    </a>
+                    <div class="nav"  style="font-size:14px;color: white;margin-top: -5px;margin-left: 1px; "  />
+                    	<a href="/index/User/login"  target="_parent" >登录</a>
+                    	<a href="register.html" target="_parent" >注册</a>
+                    </div>
+                     {/if}
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

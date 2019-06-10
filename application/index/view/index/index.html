@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>问答系统首页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<link rel="stylesheet" href="__index__/layui/css/layui.css">
+		<link rel="stylesheet" href="__index__/css/global.css">
+		<script src="__index__/layui/layui.js"></script>
+	</head>
+	<body>
+	 {include file="public/head" /}
+		<div class="main layui-clear">
+			<div class="wrap">
+				<div class="content" style="margin-right:0">
+					<div class="fly-tab">
+						<!-- 
+        <span>
+          <a href="" class="tab-this">全部</a>
+          <a href="">未结帖</a>
+          <a href="">已采纳</a>
+          <a href="">置顶帖</a>
+          <a href="../user/index.html">我的帖</a>
+        </span>
+        -->
+						<form action="" class="fly-search">
+							<i class="iconfont icon-sousuo"></i>
+							<input class="layui-input" autocomplete="off" placeholder="搜索内容" type="text" name="q">
+						</form>
+						<a href="/index/AddQuestion/index" class="layui-btn jie-add">发布问题</a>
+					</div>
+                      
+					<ul class="fly-list">
+						{volist name="data" id="vo"}
+						<li class="fly-list-li">
+							<a href="../user/home.html" class="fly-list-avatar">
+								<img src="{$vo.avatar}" alt="">
+							</a>
+							<h2 class="fly-tip">
+						}
+            <a href="/index/detail/index?id={$vo.id}">{$vo.title}</a>
+            <span class="fly-tip-stick">置顶</span>
+          </h2>
+							<p>
+								<span><a href="">{$vo.name}</a></span>
+								<span>刚刚</span>
+								<span class="fly-list-hint"> 
+              <i class="iconfont" title="回答">&#xe60c;</i> {$vo.num}
+            </span>
+							</p>
+						</li>
+				    {/volist}
+					</ul>
+
+					<!-- <div class="fly-none">并无相关数据</div> -->
+
+					<div style="text-align: center">
+						<div class="laypage-main"><span class="laypage-curr">1</span>
+							<a href="">2</a>
+							<a href="">3</a>
+							<a href="">4</a>
+							<a href="">5</a><span>…</span>
+							<a href="" class="laypage-last" title="尾页">尾页</a>
+							<a href="" class="laypage-next">下一页</a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>问题详情</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="keywords" content="fly,layui,前端社区">
+<meta name="description"
+	content="">
+<link rel="stylesheet" href="__index__/layui/css/layui.css">
+<link rel="stylesheet" href="__index__/css/global.css">
+<script src="__index__/layui/layui.js"></script>
+<script type="text/javascript" src="https://cdn.bootcss.com/vue/2.6.6/vue.common.dev.js"></script>
+<script type="text/javascript" src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+<style type="text/css" rel="stylesheet">
+form {
+	margin: 0;
+}
+
+.editor {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+</style>
+
+</head>
+<body>
+	 {include file="public/head" /}
+	<div class="main layui-clear">
+		<div class="wrap">
+			<div class="content detail">
+				<div class="fly-panel detail-box">
+					<h1>{$data.title}</h1>
+					<div class="fly-tip fly-detail-hint" data-id="">
+						<span class="fly-tip-stick">置顶帖</span><span class="jie-admin"> <a
+							href="">点击置顶</a> </span> <span
+							class="layui-btn layui-btn-mini jie-admin"> <a href="">取消置顶</a>
+						</span> <span class="jie-admin" type="del" style="margin-left: 20px;">
+							<a>删除该帖</a> </span> 
+						</span>
+						<div class="fly-list-hint">
+							<i class="iconfont" title="回答">&#xe60c;</i> {$data.num} 
+							<i><i
+						class="iconfont">&#xe60b;</i> {$data.views}</i>
+						</div>
+					</div>
+					<div class="detail-about">
+						<a class="jie-user" href=""> <img
+							src="{$data.avatar}" alt="头像"> <cite> {$data.name}
+								<em>{$data.time}发布</em> </cite> </a>
+						<div class="detail-hits" data-id="{{rows.id}}">
+							 <span class="layui-btn layui-btn-mini jie-admin"><a
+								href="#">已完帖，无法编辑</a> </span> <span
+								class="layui-btn layui-btn-mini jie-admin" type="collect"
+								data-type="add"> <a id="collectPost">收藏</a> </span> <span
+								class="layui-btn layui-btn-mini jie-admin  layui-btn-danger"
+								type="collect" data-type="add"> <a>取消收藏</a> </span>
+
+						</div>
+					</div>
+					<div class="detail-body photos" style="margin-bottom: 20px;">
+						<p>{$data.content}</p>
+					</div>
+				</div>
+				<div class="fly-panel detail-box" style="padding-top: 0;"  id="app">
+					<a name="comment"></a>
+					<ul class="jieda photos" id="jieda">
+						
+						<li data-id="12" class="jieda-daan" v-for="(item,index) in list"><a
+							name="item-121212121212"></a>
+							<div class="detail-about detail-about-reply">
+								<a class="jie-user" href="#"> <img
+									:src="item.avatar" alt=""> <cite> <i>{{item.name}}</i>
+										<em v-if="'{$Request.session.user.userName}'==item.name">(楼主)</em> </cite> </a>
+								<div class="detail-hits">
+									<span>3分钟前</span>
+								</div>
+								<!-- <i class="iconfont icon-caina" title="最佳答案"></i> -->
+							</div>
+							<div class="detail-body jieda-body">
+								<p>{{item.comment}}</p>
+							</div>
+							<div class="jieda-reply">
+								<span class="jieda-zan " :class="item.is_support?'zanok':''" type="zan" @click=support(item,1,index)><i
+									class="iconfont icon-zan " ></i><em>{{item.support}}</em>
+								</span> 
+								<!-- <div class="jieda-admin">
+                <span type="del">删除</span>
+                <span class="jieda-accept" type="accept">采纳</span>
+              </div> -->
+							</div></li>
+					
+
+						<!-- <li class="fly-none">没有任何回答</li> -->
+					</ul>
+					<span
+										id="toName">@{$data.name}(楼主)</span>		
+					<div class="layui-form layui-form-pane">
+						<form action="">
+							<div class="layui-form-item layui-form-text">
+								<div class="layui-input-block">
+										<textarea id="L_content" name="content" required
+										lay-verify="required" placeholder="我要回答" v-model="comments"
+										class="layui-textarea fly-editor" style="height: 150px;" ></textarea>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<button class="layui-btn" lay-filter="*" onclick="return false;" @click="addComm" >提交回答</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="edge">
+			<dl class="fly-panel fly-list-one">
+				<dt class="fly-panel-title">最近热帖</dt>
+				{volist name="hotView" id="vo"}
+				<dd>
+					<a href="">{$vo.title}</a> <span><i
+						class="iconfont">&#xe60b;</i> {$vo.views}</span>
+				</dd>
+		        {/volist}
+			</dl>
+
+			<dl class="fly-panel fly-list-one">
+				<dt class="fly-panel-title">近期热议</dt>
+				{volist name="hotTalk" id="vo"}
+				<dd>
+					<a href="">{$vo.title}</a> <span><i
+						class="iconfont">&#xe60c;</i> {$vo.counts}</span>
+				</dd>
+				{/volist}
+			</dl>
+		</div>
+	</div>
+ <script type="text/javascript" charset="utf-8" src="__index__/js/kindeditor.js"></script>
+  <script type="text/javascript">
+  
+  </script>
+  <script type="text/javascript">
+	new Vue({
+		el:'#app',
+        data:{
+            list:[],
+            comments:'',
+            userid:'',
+            avatar:''
+        },
+        created(){
+          this.getList();
+        //   var data=this.getCookie('user');
+        //   if (data) {
+        //     console.log(JSON.parse(data).id)
+        //     this.userid=JSON.parse(data).id;
+        //     this.avatar=JSON.parse(data).avatar;
+        // }else{
+        //     window.location.href='http://127.0.0.1/index.php/index/index/index'
+        // }
+    },
+    methods:{
+    	 
+       getList:function () {
+          var that=this;
+          axios.get('http://127.0.0.1/index/Detail/getComments',{
+          	params:that.getQueryString(window.location.href)
+          	
+          }).then((res)=>{
+             that.list=res.data.data
+             console.log(res.data.data)
+
+         })
+
+      },
+      addComm:function () {
+      	console.log(this.comments)
+          var that=this;
+          axios.get('http://127.0.0.1/index/Detail/addComment',{
+           params:{
+              value:that.comments,
+              id:that.getQueryString(window.location.href).id,
+
+          }
+      }).then((res)=>{
+       if (res.data.code==0) {
+          return alert('!')
+      }
+      console.log(that.list)
+      that.list.push(res.data.data)
+      that.comments=''
+  })
+
+  },
+  sendreply:function (lis,type,idx) {
+
+    var that=this;
+    var res=prompt("回复"+lis.name,"");
+    if (res!=null && res!="") {
+      axios.get('http://127.0.0.1/index/Comment/addReply',{
+       params:{
+          content:res,
+          fromId:that.userid,
+          toUser:lis.userId,
+          type:type,
+          commentid:that.list[idx].id,
+      }
+  }).then((res)=>{
+   if (!that.list[idx].reply) {
+      that.$set(that.list[idx],'reply',[res.data.data])
+      console.log(that.list)
+  }
+  else{
+   that.list[idx].reply.push(res.data.data)
+}
+
+}).catch(function (error) { // 请求失败处理
+        console.log(error);
+      })
+}
+},
+
+    support(list,type,idx,replyindex=0){
+        var that=this;
+        axios.get('http://127.0.0.1/index/Detail/addSupport',{
+            params:{
+                commentid:list.id,
+                type:type,
+                quesId:list.quesId
+            }
+        }).then((res)=>{
+         if (res.data.code==1) {
+            if (type==1) {
+                console.log(123)
+                that.list[idx].support+=1
+                 that.list[idx].is_support=1
+                that.$set(that.list,idx,that.list[idx])
+            }else{
+                console.log(replyindex)
+                that.list[idx].reply[replyindex].support+=1;
+                that.$set(that.list[idx],idx,that.list[idx].reply[replyindex])
+
+            }
+        }else if(res.data.code==2){
+            if (type==1) {
+                that.list[idx].support-=1
+                that.list[idx].is_support=0
+                that.$set(that.list,idx,that.list[idx])
+            }else{
+                console.log(replyindex)
+                that.list[idx].reply[replyindex].support-=1;
+                that.$set(that.list[idx],idx,that.list[idx].reply[replyindex])
+            }
+        }
+    })
+    },
+    getQueryString:function(name) { 
+        var url = location.search; //获取url中"?"符后的字串  
+   var theRequest = new Object();  
+   if (url.indexOf("?") != -1) {  
+      var str = url.substr(1);  
+      strs = str.split("&");  
+      for(var i = 0; i < strs.length; i ++) {  
+         theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+      }  
+   }  
+   console.log(theRequest)
+   return theRequest;  
+    },
+}
+
+})
+</script>
+</body>
+</html>
